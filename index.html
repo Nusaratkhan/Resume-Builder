@@ -1,0 +1,221 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Resume Builder</title>
+  <style>
+    * {
+      font-family: 'Inter', sans-serif;
+      box-sizing: border-box;
+    }
+    body {
+      background: linear-gradient(to right, #667eea, #764ba2);
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    .container {
+      background: white;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    h1, h2 {
+      text-align: center;
+      color: #444;
+    }
+    label {
+      font-weight: 600;
+      display: block;
+      margin-top: 15px;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 12px;
+      margin-top: 6px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 14px;
+      background-color: #4f46e5;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #3c36b0;
+    }
+    #resumeContent {
+      white-space: pre-wrap;
+      background: #f7f7f7;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 30px;
+    }
+    .photo-placeholder {
+      width: 100px;
+      height: 100px;
+      border: 2px solid #aaa;
+      border-radius: 6px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #999;
+      margin-bottom: 20px;
+      cursor: pointer;
+    }
+    .photo-placeholder img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+    /* pre {
+      background: #fff;
+      padding: 20px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    } */
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Resume Builder for Students</h1>
+    <form id="resumeForm">
+      <div class="photo-placeholder" id="photoPlaceholder" onclick="document.getElementById('photoInput').click();">
+        Click to upload
+      </div>
+      <input type="file" id="photoInput" accept="image/*" style="display:none"/>
+
+      <label for="template">Select Template Style:</label>
+      <select id="template" onchange="switchTemplate()">
+        <option value="classic">Classic</option>
+        <option value="modern">Modern</option>
+         <option value="Advance">Advance</option>
+      </select>
+
+      <h2>Contact Information</h2>
+      <label for="name">Full Name:</label>
+      <input type="text" id="name" name="name" required />
+
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required />
+
+      <label for="phone">Phone Number:</label>
+      <input type="text" id="phone" name="phone" />
+
+      <h2>Summary/Objective</h2>
+      <label for="summary">Brief Summary or Objective:</label>
+      <textarea id="summary" name="summary" placeholder="e.g., Highly motivated computer science student seeking an internship to apply programming skills in a real-world environment."></textarea>
+
+      <h2>Education</h2>
+      <label for="education">Education Details</label>
+      <textarea id="education" name="education" placeholder="e.g., Bachelor of Technology in Computer Science and Engineering&#10;XYZ Institute of Technology, Lucknow&#10;Graduation: May 2026&#10;GPA: 8.5/10"></textarea>
+
+      <h2>Experience (Internships/Projects)</h2>
+      <label for="experience">Work Experience or Major Projects:</label>
+      <textarea id="experience" name="experience" placeholder="e.g., **Software Developer Intern | ABC Company | May - Aug 2025**&#10;- Developed a user authentication module using Python and Flask.&#10;- Contributed to database design and API development.&#10;&#10;**E-commerce Website (Personal Project)**&#10;- Built a full-stack e-commerce site with React, Node.js, and MongoDB.&#10;- Implemented features like user carts, product listings, and payment integration."></textarea>
+
+      <h2>Skills</h2>
+      <label for="skills">Technical And Non-Technical Skills:</label>
+      <input type="text" id="skills" name="skills" placeholder="e.g., Python, Java, C++, JavaScript, React, SQL, Git, Linux">
+
+      <button type="submit"> Generate Resume</button>
+      <button type="button" onclick="downloadResume()">Download as PDF</button>
+      <button type="button" onclick="saveResume()">Save Resume</button>
+      <button type="button" onclick="loadResume()">Load Resume</button>
+    </form>
+  <h2>Generated Resume:</h2>
+  <!-- <pre id="resumeContent">Your resume will appear here...</pre> -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script>
+   const resumeForm = document.getElementById("resumeForm");
+
+resumeForm.addEventListener("submit", async function (e) {
+  e.preventDefault();
+  const formData = new FormData(resumeForm);
+  const data = Object.fromEntries(formData.entries());
+
+  const res = await fetch("/generate_resume", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  const result = await res.text();
+ document.getElementById("resumeContent").innerText = result || "Failed to generate resume.";
+
+});
+
+    function downloadResume() {
+      const element = document.getElementById("resumeContent");
+      html2pdf().from(element).save("resume.pdf");
+    }
+
+    function saveResume() {
+      const formData = new FormData(resumeForm);
+      const data = Object.fromEntries(formData.entries());
+      localStorage.setItem("myResume", JSON.stringify(data));
+      alert("Resume saved locally!");
+    }
+
+    function loadResume() {
+      const savedData = localStorage.getItem("myResume");
+      if (savedData) {
+        const data = JSON.parse(savedData);
+        for (let key in data) {
+          const el = document.getElementsByName(key)[0];
+          if (el) el.value = data[key];
+        }
+        alert("Resume loaded.");
+      } else {
+        alert("No resume found.");
+      }
+    }
+
+    function switchTemplate() {
+      const container = document.querySelector(".container");
+      const value = document.getElementById("template").value;
+      if (value === "modern") {
+        container.style.backgroundColor = "#f0f0ff";
+        container.style.border = "2px solid #764ba2";
+      } else if (value === "Advance") {
+        container.style.backgroundColor = "#e4d1e8";
+        container.style.border = "2px solid #1f1e45";
+        
+      } 
+      else {
+        container.style.backgroundColor = "#ffffff";
+        container.style.border = "none";
+      }
+    }
+
+    document.getElementById("photoInput").addEventListener("change", function () {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          document.getElementById("photoPlaceholder").innerHTML = `<img src="${e.target.result}" alt="Profile Photo">`;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+</script>
+</body>
+</html>
