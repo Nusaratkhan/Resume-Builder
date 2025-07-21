@@ -5,93 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Resume Builder</title>
-  <style>
-    * {
-      font-family: 'Inter', sans-serif;
-      box-sizing: border-box;
-    }
-    body {
-      background: linear-gradient(to right, #667eea, #764ba2);
-      margin: 0;
-      padding: 0;
-      color: #333;
-    }
-    .container {
-      background: white;
-      max-width: 800px;
-      margin: 40px auto;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-    h1, h2 {
-      text-align: center;
-      color: #444;
-    }
-    label {
-      font-weight: 600;
-      display: block;
-      margin-top: 15px;
-    }
-    input, textarea, select {
-      width: 100%;
-      padding: 12px;
-      margin-top: 6px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-    textarea {
-      resize: vertical;
-      min-height: 80px;
-    }
-    button {
-      margin-top: 20px;
-      width: 100%;
-      padding: 14px;
-      background-color: #4f46e5;
-      color: white;
-      font-size: 16px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #3c36b0;
-    }
-    #resumeContent {
-      white-space: pre-wrap;
-      background: #f7f7f7;
-      padding: 20px;
-      border-radius: 8px;
-      margin-top: 30px;
-    }
-    .photo-placeholder {
-      width: 100px;
-      height: 100px;
-      border: 2px solid #aaa;
-      border-radius: 6px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: #999;
-      margin-bottom: 20px;
-      cursor: pointer;
-    }
-    .photo-placeholder img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 6px;
-    }
-    /* pre {
-      background: #fff;
-      padding: 20px;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-      border-radius: 8px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    } */
-  </style>
+  <link rel="stylesheet" href="Resume_Builder/public/style.css">
 </head>
 <body>
   <div class="container">
@@ -139,83 +53,10 @@
       <button type="button" onclick="downloadResume()">Download as PDF</button>
       <button type="button" onclick="saveResume()">Save Resume</button>
       <button type="button" onclick="loadResume()">Load Resume</button>
-    </form>
-  <h2>Generated Resume:</h2>
-  <!-- <pre id="resumeContent">Your resume will appear here...</pre> -->
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <script>
-   const resumeForm = document.getElementById("resumeForm");
-
-resumeForm.addEventListener("submit", async function (e) {
-  e.preventDefault();
-  const formData = new FormData(resumeForm);
-  const data = Object.fromEntries(formData.entries());
-
-  const res = await fetch("/generate_resume", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-
-  const result = await res.text();
- document.getElementById("resumeContent").innerText = result || "Failed to generate resume.";
-
-});
-
-    function downloadResume() {
-      const element = document.getElementById("resumeContent");
-      html2pdf().from(element).save("resume.pdf");
-    }
-
-    function saveResume() {
-      const formData = new FormData(resumeForm);
-      const data = Object.fromEntries(formData.entries());
-      localStorage.setItem("myResume", JSON.stringify(data));
-      alert("Resume saved locally!");
-    }
-
-    function loadResume() {
-      const savedData = localStorage.getItem("myResume");
-      if (savedData) {
-        const data = JSON.parse(savedData);
-        for (let key in data) {
-          const el = document.getElementsByName(key)[0];
-          if (el) el.value = data[key];
-        }
-        alert("Resume loaded.");
-      } else {
-        alert("No resume found.");
-      }
-    }
-
-    function switchTemplate() {
-      const container = document.querySelector(".container");
-      const value = document.getElementById("template").value;
-      if (value === "modern") {
-        container.style.backgroundColor = "#f0f0ff";
-        container.style.border = "2px solid #764ba2";
-      } else if (value === "Advance") {
-        container.style.backgroundColor = "#e4d1e8";
-        container.style.border = "2px solid #1f1e45";
-        
-      } 
-      else {
-        container.style.backgroundColor = "#ffffff";
-        container.style.border = "none";
-      }
-    }
-
-    document.getElementById("photoInput").addEventListener("change", function () {
-      const file = this.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          document.getElementById("photoPlaceholder").innerHTML = `<img src="${e.target.result}" alt="Profile Photo">`;
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-</script>
+      </form>
+     <h2>Generated Resume:</h2>
+     <pre id="resumeContent">Your resume will appear here...</pre> 
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+     <script src="Resume_Builder/public/script.js"></script>
 </body>
 </html>
